@@ -11,7 +11,7 @@ SCREEN_HEIGHT = 400
 
 # Set up the display
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Infinite Runner Game")
+pygame.display.set_caption("Automata Game")
 
 # Load the background image
 background = pygame.image.load("background.png").convert()
