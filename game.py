@@ -162,7 +162,7 @@ while running:
         # Manage obstacle spawning
         obstacle_spawn_timer += 1
         if obstacle_spawn_timer >= obstacle_spawn_time:
-            if len(obstacles) < 3:
+            if len(obstacles) < 2:
                 new_obstacle = Obstacle(obstacle_frames)
                 obstacles.add(new_obstacle)
                 all_sprites.add(new_obstacle)
