@@ -115,10 +115,6 @@ class Obstacle(pygame.sprite.Sprite):
         self.image = self.frames[self.current_frame]
         self.image = pygame.transform.scale(self.image, (45, 45))
 
-    def set_speed(self, speed):
-        """Update the speed of the obstacle."""
-        self.speed = speed
-
 # Load obstacle frames
 obstacle_frames = load_gif_frames("devil.gif")
 
@@ -134,14 +130,13 @@ clock = pygame.time.Clock()
 state = "menu"  # Starting state
 obstacle_spawn_timer = 0
 obstacle_spawn_time = 120  # Initial obstacle spawn time
-obstacle_speed = 5 # Initial obstacle speed
-speed_increase_interval = 1000  # Score interval to increase speed
+obstacle_speed = 10  # Initial obstacle speed
+speed_increase_interval = 500  # Score interval to increase speed
 MAX_OBSTACLES = 5
 
 # Scoring system
 score = 0  # Initialize score
 score_font = pygame.font.Font(None, 36)  # Font for displaying the score
-speed_font = pygame.font.Font(None, 36)  # Font for displaying the speed
 
 # Function to reset the game
 def reset_game():
@@ -151,7 +146,7 @@ def reset_game():
     obstacles.empty()  # Clear obstacles
     all_sprites.empty()  # Clear all sprites
     score = 0  # Reset score
-    obstacle_speed = 5 # Reset obstacle speed
+    obstacle_speed = 5  # Reset obstacle speed
     obstacle_spawn_time = 120  # Reset spawn time
 
     # Initialize a new player and add to sprite groups
@@ -188,15 +183,13 @@ while running:
     if state == "playing":
         all_sprites.update()
 
-        # Increment score over time only if the game is playing
-        score += 1
+        # Increment score over time
+        score += 2
 
         # Check if score has reached the interval for increasing speed
-        if score % speed_increase_interval == 0 and score != 0:
-            obstacle_speed += 1  # Increase obstacle speed by 10 every 500 points
-            # Update the speed of all existing obstacles
-            for obstacle in obstacles:
-                obstacle.set_speed(obstacle_speed)
+        if score % speed_increase_interval == 0:
+            obstacle_speed += 40 # Increase obstacle speed
+            obstacle_spawn_time = max(30, obstacle_spawn_time - 10)  # Decrease spawn time (minimum 30)
 
         if pygame.sprite.spritecollide(player, obstacles, False):
             state = "game_over"  # Change state to game over
@@ -206,7 +199,7 @@ while running:
         # Manage obstacle spawning
         obstacle_spawn_timer += 1
         if obstacle_spawn_timer >= obstacle_spawn_time:
-            if len(obstacles) < 2:  # Limit the number of obstacles on screen
+            if len(obstacles) < 2:
                 new_obstacle = Obstacle(obstacle_frames, obstacle_speed)  # Pass the current obstacle speed
                 obstacles.add(new_obstacle)
                 all_sprites.add(new_obstacle)
@@ -220,7 +213,7 @@ while running:
 
     if state == "menu":
         # Draw the game title
-        title_text = pygame.font.Font(None, 48).render("Endless Escape", True, (0, 0, 0))
+        title_text = pygame.font.Font(None, 48).render("Endless Escape: The Infinite Run", True, (0, 0, 0))
         screen.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
         
         # Draw menu text below the title
@@ -230,13 +223,9 @@ while running:
     elif state == "playing":
         all_sprites.draw(screen)
 
-        # Display the score
+        # Display the score in the top-left corner
         score_text = score_font.render(f"Score: {score}", True, (0, 0, 0))
         screen.blit(score_text, (10, 10))
-
-        # Display the speed below the score
-        speed_text = speed_font.render(f"Speed: {obstacle_speed}", True, (0, 0, 0))
-        screen.blit(speed_text, (10, 50))
 
     elif state == "game_over":
         game_over_text = pygame.font.Font(None, 36).render("GAME OVER!", True, (255, 0, 0))
